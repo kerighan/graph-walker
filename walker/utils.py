@@ -39,7 +39,7 @@ def _corrupt_walks(walks, adj_indptr, adj_indices, num_nodes, p=.1):
     num_corruptions = int(walks.size * p)
     walk_len = walks.shape[1]
     num_walks = walks.shape[0]
-    similarity = np.ones(walks.shape, dtype=np.uint8)
+    similarity = np.ones((num_walks, walk_len - 1), dtype=np.uint8)
     for i in prange(num_corruptions):
         # draw random position on matrix
         x = np.random.randint(0, num_walks)
