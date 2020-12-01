@@ -3,10 +3,10 @@ import setuptools
 
 setuptools.setup(
     name="graph-walker",
-    version="0.0.2",
+    version="0.0.3",
     author="Maixent Chenebaux",
     author_email="max.chbx@gmail.com",
-    description="Fast random walks on graph",
+    description="Fastest library for random walks on graph",
     url="https://github.com/kerighan/graph-walker",
     packages=setuptools.find_packages(),
     include_package_data=True,

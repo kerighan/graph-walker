@@ -1,3 +1,12 @@
+# How to install
+
+```
+pip install graph-walker
+```
+
+# How to use
+
+```python
 import networkx as nx
 import walker
 
@@ -11,4 +20,7 @@ X = walker.random_walks(G, n_walks=50, walk_len=25)
 X = walker.node2vec_random_walks(G, n_walks=50, walk_len=25, p=.25, q=.25)
 
 # corrupt random walks by randomly changing nodes in random walks
+# `y` matrix has a size (N, walk_len - 1) with:
+# y[i, j] = 1 if nodes X[i, j] and X[i, j + 1] share an edge, 0 otherwise
 X, y = walker.corrupt(G, X, r=.1)
+```
