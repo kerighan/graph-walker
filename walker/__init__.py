@@ -1,4 +1,8 @@
-from .walks import _random_walks, _corrupt_walks, _node2vec_random_walks
+from .walks import (
+    _random_walks,
+    _node2vec_random_walks,
+    _corrupt_walks,
+    _weighted_corrupt_walks)
 from .preprocess import _preprocess_graph
 import networkx as nx
 import numpy as np
@@ -38,16 +42,24 @@ def random_walks(G, n_walks=10, walk_len=10, verbose=True):
     return walks
 
 
-def corrupt(G, walks, r=.1, verbose=True):
+def corrupt(G, walks, r=.1, use_degree=True, verbose=True):
     start_time = time.time()
+    n_nodes = len(G.nodes)
 
     A = nx.adjacency_matrix(G)
     adj_indptr = A.indptr
     adj_indices = A.indices
 
-    n_nodes = len(G.nodes)
-    walks, similarity = _corrupt_walks(
-        walks, adj_indptr, adj_indices, n_nodes, p=r)
+    if use_degree:
+        degree = np.array(A.sum(axis=1), dtype=np.float32).reshape((n_nodes,))
+        degree = degree.cumsum()
+        degree /= degree.max()
+    
+        walks, similarity = _weighted_corrupt_walks(
+            walks, adj_indptr, adj_indices, n_nodes, degree, p=r)
+    else:
+        walks, similarity = _corrupt_walks(
+            walks, adj_indptr, adj_indices, n_nodes, p=r)
 
     if verbose:
         duration = time.time() - start_time

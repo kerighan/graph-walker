@@ -156,3 +156,54 @@ def _corrupt_walks(walks, adj_indptr, adj_indices, n_nodes, p=.1):
             similarity[x, y] = next_value
 
     return walks, similarity
+
+
+@jit(nopython=True, parallel=True, nogil=True, fastmath=True)
+def _weighted_corrupt_walks(walks, adj_indptr, adj_indices, n_nodes, weights, p=.1):
+    n_corruptions = int(walks.size * p)
+    walk_len = walks.shape[1]
+    n_walks = walks.shape[0]
+    similarity = np.ones((n_walks, walk_len - 1), dtype=np.uint8)
+    for i in prange(n_corruptions):
+        # draw random position on matrix
+        x = np.random.randint(0, n_walks)
+        y = np.random.randint(1, walk_len)
+
+        # draw random float
+        draw = np.random.rand()
+        # change step by a random node
+        random_node = np.searchsorted(weights, draw)
+        walks[x, y] = random_node
+
+        # change similarity value based on adjacency matrix
+        start = adj_indptr[random_node]
+        end = adj_indptr[random_node + 1]
+        neighbors = adj_indices[start:end]
+
+        # modify connectivity around corruption
+        previous_node = walks[x, y - 1]
+        if y > walk_len - 2:
+            previous_value = 0
+            for neighbor in neighbors:
+                if neighbor == previous_node:
+                    value = 1
+                    break
+            similarity[x, y - 1] = previous_value
+        else:
+            next_node = walks[x, y + 1]
+            previous_value = 0
+            next_value = 0
+            found = 0
+            for neighbor in neighbors:
+                if neighbor == previous_node:
+                    previous_value = 1
+                    found += 1
+                elif neighbor == next_node:
+                    next_node = 1
+                    found += 1
+                if found == 2:
+                    break
+            similarity[x, y - 1] = previous_value
+            similarity[x, y] = next_value
+
+    return walks, similarity
