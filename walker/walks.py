@@ -13,7 +13,7 @@ def _random_walks(
     n_walks,
     walk_len
 ):
-    walks = np.zeros((n_nodes * n_walks, walk_len), dtype=np.uint16)
+    walks = np.zeros((n_nodes * n_walks, walk_len), dtype=np.uint32)
     for i in prange(n_nodes * n_walks):
         step = i % n_nodes
         walks[i, 0] = step
@@ -49,7 +49,7 @@ def _node2vec_random_walks(
     walk_len,
     p=.5, q=.5
 ):
-    walks = np.zeros((n_nodes * n_walks, walk_len), dtype=np.uint16)
+    walks = np.zeros((n_nodes * n_walks, walk_len), dtype=np.uint32)
     for i in prange(n_nodes * n_walks):
         step = i % n_nodes
         walks[i, 0] = step
