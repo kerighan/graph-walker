@@ -9,14 +9,17 @@ import numpy as np
 import time
 
 
-def node2vec_random_walks(G, p=.25, q=.25, n_walks=10, walk_len=10, verbose=True):
+def node2vec_random_walks(
+    G, p=.25, q=.25,
+    n_walks=10,
+    walk_len=10,
+    sub_sampling=0.1,
+    verbose=True):
     start_time = time.time()
 
     n_nodes = len(G.nodes)
-    A = nx.adjacency_matrix(G).astype(np.float32)
-    indptr = A.indptr
-    data = A.data
-    indices = A.indices
+    indptr, data, indices = _preprocess_graph(
+        G, n_nodes, sub_sampling=sub_sampling)
     walks = _node2vec_random_walks(
         indptr, data, indices, n_nodes,
         n_walks, walk_len, p, q)
@@ -27,11 +30,18 @@ def node2vec_random_walks(G, p=.25, q=.25, n_walks=10, walk_len=10, verbose=True
     return walks
 
 
-def random_walks(G, n_walks=10, walk_len=10, verbose=True):
+def random_walks(
+    G,
+    n_walks=10,
+    walk_len=10,
+    sub_sampling=0.1,
+    verbose=True
+):
     start_time = time.time()
 
     n_nodes = len(G.nodes)
-    indptr, data, indices = _preprocess_graph(G, n_nodes)
+    indptr, data, indices = _preprocess_graph(
+        G, n_nodes, sub_sampling=sub_sampling)
     walks = _random_walks(
         indptr, data, indices, n_nodes,
         n_walks, walk_len)
