@@ -2,7 +2,7 @@
 #include <time.h>
 #include <stdint.h>
 
-uint64_t s[ 2 ] = {time(nullptr), std::rand()};
+uint64_t s[ 2 ] = {(uint64_t)time(nullptr), (uint64_t)std::rand()};
 uint64_t xorshift128(void) { 
     uint64_t s1 = s[ 0 ];
     const uint64_t s0 = s[ 1 ];

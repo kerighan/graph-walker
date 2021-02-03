@@ -67,7 +67,7 @@ def corrupt(G, walks, r=.01, ns_exponent=.75, negative_size=100000, verbose=True
         replace=True)
 
     # corrupt random walks
-    similarity = _corrupt(walks, indptr, indices, neg, n_nodes, r)
+    similarity = _corrupt(walks, neg, n_nodes, r)
 
     if verbose:
         elapsed = time.time() - start_time
@@ -132,7 +132,7 @@ def corrupted_random_walks(
         replace=True)
 
     # corrupt random walks
-    similarity = _corrupt(walks, indptr, indices, neg, n_nodes, r)
+    similarity = _corrupt(walks, neg, n_nodes, r)
 
     if verbose:
         elapsed = time.time() - start_time

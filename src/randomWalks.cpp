@@ -224,7 +224,7 @@ py::array_t<bool> corruptWalks(py::array_t<uint32_t> _walks, size_t nNodes, floa
     py::array_t<bool> _similarity({nWalks, walkLen});
     py::buffer_info similarityBuf = _similarity.request();
     bool *similarity = (bool *) similarityBuf.ptr;
-    for (int i = 0; i < nWalks * walkLen; i++){
+    for (size_t i = 0; i < nWalks * walkLen; i++){
         similarity[i] = true;
     }
 
@@ -246,16 +246,10 @@ py::array_t<bool> corruptWalks(py::array_t<uint32_t> _walks, size_t nNodes, floa
 
 
 // def _weighted_corrupt_walks(walks, adj_indptr, adj_indices, n_nodes, weights, p=.1):
-py::array_t<bool> weightedCorruptWalks(py::array_t<uint32_t> _walks, py::array_t<uint32_t> _indptr, py::array_t<uint32_t>_indices, py::array_t<uint32_t> _candidates, size_t nNodes, float r){
+py::array_t<bool> weightedCorruptWalks(py::array_t<uint32_t> _walks, py::array_t<uint32_t> _candidates, size_t nNodes, float r){
     // get data buffers
     py::buffer_info walksBuf = _walks.request();
     uint32_t *walks = (uint32_t *) walksBuf.ptr;
-
-    py::buffer_info indptrBuf = _indptr.request();
-    uint32_t *indptr = (uint32_t *) indptrBuf.ptr;
-
-    py::buffer_info indicesBuf = _indices.request();
-    uint32_t *indices = (uint32_t *) indicesBuf.ptr;
 
     py::buffer_info candidatesBuf = _candidates.request();
     uint32_t *candidates = (uint32_t *) candidatesBuf.ptr;
@@ -269,7 +263,7 @@ py::array_t<bool> weightedCorruptWalks(py::array_t<uint32_t> _walks, py::array_t
     py::array_t<bool> _similarity({nWalks, walkLen - 1});
     py::buffer_info similarityBuf = _similarity.request();
     bool *similarity = (bool *) similarityBuf.ptr;
-    for (int i = 0; i < nWalks * (walkLen - 1); i++){
+    for (size_t i = 0; i < nWalks * (walkLen - 1); i++){
         similarity[i] = true;
     }
 
@@ -284,10 +278,6 @@ py::array_t<bool> weightedCorruptWalks(py::array_t<uint32_t> _walks, py::array_t
         walks[x * walkLen + y] = randomNode;
 
         // change similarity value based on adjacency matrix
-        size_t start = indptr[randomNode];
-        size_t end = indptr[randomNode + 1];
-        uint32_t previousNode = walks[x * walkLen + y - 1];
-
         similarity[x * (walkLen - 1) + y - 1] = 0;
         similarity[x * (walkLen - 1) + y] = 0;
 
