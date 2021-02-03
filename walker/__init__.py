@@ -95,7 +95,6 @@ def corrupted_random_walks(
     indices = A.indices.astype(np.uint32)
     data = A.data.astype(np.float32)
 
-
     if start_nodes is None:
         start_nodes = np.arange(len(G.nodes)).astype(np.uint32)
     else:
