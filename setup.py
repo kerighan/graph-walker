@@ -4,7 +4,6 @@ import pybind11
 import os
 
 
-compiler_args = "-Ofast -mavx2 -march=native".split()
 ext_modules = [
     Extension(
         '_walker',
@@ -13,19 +12,19 @@ ext_modules = [
         include_dirs=[
             pybind11.get_include(),
             pybind11.get_include(True),],
-        extra_compile_args=compiler_args)
+        extra_compile_args=["-Ofast"])
 ]
 
 
 setup(
     name="graph-walker",
-    version="1.0.0",
+    version="1.0.2",
     author="Maixent Chenebaux",
     author_email="max.chbx@gmail.com",
     description="Fastest library for random walks on graph",
     url="https://github.com/kerighan/graph-walker",
     packages=find_packages(),
-    install_requires=["networkx", "numpy", "scipy", "pybind11"],
+    install_requires=["networkx", "numpy", "scipy", "pybind11", "scikit-learn"],
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",

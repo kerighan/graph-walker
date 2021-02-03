@@ -11,7 +11,7 @@ def random_walks(
     G,
     n_walks=10,
     walk_len=10,
-    sub_sampling=0.1,
+    sub_sampling=0.,
     p=1, q=1,
     start_nodes=None,
     verbose=True
@@ -80,7 +80,7 @@ def corrupted_random_walks(
     G,
     n_walks=10,
     walk_len=10,
-    sub_sampling=0.1,
+    sub_sampling=0.,
     p=1, q=1, r=.1,
     ns_exponent=.75,
     negative_size=100000,
