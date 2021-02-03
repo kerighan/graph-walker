@@ -1,6 +1,7 @@
 # How to install
 
 ```
+pip install pybind11
 pip install graph-walker
 ```
 
@@ -16,8 +17,8 @@ G = nx.random_partition_graph([1000] * 15, .01, .001)
 # generate random walks
 X = walker.random_walks(G, n_walks=50, walk_len=25)
 
-# generate random walks according to Node2Vec methodology
-X = walker.node2vec_random_walks(G, n_walks=50, walk_len=25, p=.25, q=.25)
+# generate random walks according to Node2Vec methodology by specifying p and q
+X = walker.random_walks(G, n_walks=50, walk_len=25, p=.25, q=.25)
 
 # corrupt random walks by randomly changing nodes in random walks
 # `y` matrix has a size (N, walk_len - 1) with:

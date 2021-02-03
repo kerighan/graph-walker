@@ -1,21 +1,24 @@
-import setuptools
+from setuptools import setup, find_packages, Extension
+from glob import glob
+import pybind11
+import os
 
 
-setuptools.setup(
-    name="graph-walker",
-    version="0.0.6",
-    author="Maixent Chenebaux",
-    author_email="max.chbx@gmail.com",
-    description="Fastest library for random walks on graph",
-    url="https://github.com/kerighan/graph-walker",
-    packages=setuptools.find_packages(),
-    include_package_data=True,
-    install_requires=["networkx", "numpy", "scipy", "numba"],
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
-    python_requires=">=3.5"
+compiler_args = "-Ofast -mavx2 -march=native".split()
+ext_modules = [
+    Extension(
+        '_walker',
+        sorted(glob("src/*.cpp")),
+        language='c++',
+        include_dirs=[
+            pybind11.get_include(),
+            pybind11.get_include(True),],
+        extra_compile_args=compiler_args)]
+
+
+setup(
+    name="walker",
+    version="1.0.0",
+    packages=find_packages(),
+    ext_modules=ext_modules
 )

@@ -1,33 +1,10 @@
-from .walks import (
-    _random_walks,
-    _node2vec_random_walks,
-    _corrupt_walks,
-    _weighted_corrupt_walks)
-from .preprocess import _preprocess_graph
+from _walker import random_walks as _random_walks
+from _walker import node2vec_random_walks as _node2vec_random_walks
+from _walker import weighted_corrupt as _corrupt
+from .preprocessing import get_normalized_adjacency
 import networkx as nx
 import numpy as np
 import time
-
-
-def node2vec_random_walks(
-    G, p=.25, q=.25,
-    n_walks=10,
-    walk_len=10,
-    sub_sampling=0.1,
-    verbose=True):
-    start_time = time.time()
-
-    n_nodes = len(G.nodes)
-    indptr, data, indices = _preprocess_graph(
-        G, n_nodes, sub_sampling=sub_sampling)
-    walks = _node2vec_random_walks(
-        indptr, data, indices, n_nodes,
-        n_walks, walk_len, p, q)
-    
-    if verbose:
-        duration = time.time() - start_time
-        print(f"Random walks - T={duration:.2f}s")
-    return walks
 
 
 def random_walks(
@@ -35,43 +12,130 @@ def random_walks(
     n_walks=10,
     walk_len=10,
     sub_sampling=0.1,
+    p=1, q=1,
+    start_nodes=None,
     verbose=True
 ):
     start_time = time.time()
 
-    n_nodes = len(G.nodes)
-    indptr, data, indices = _preprocess_graph(
-        G, n_nodes, sub_sampling=sub_sampling)
-    walks = _random_walks(
-        indptr, data, indices, n_nodes,
-        n_walks, walk_len)
-    
+    A = get_normalized_adjacency(G, sub_sampling=sub_sampling)
+    indptr = A.indptr.astype(np.uint32)
+    indices = A.indices.astype(np.uint32)
+    data = A.data.astype(np.float32)
+
+    if start_nodes is None:
+        start_nodes = np.arange(len(G.nodes)).astype(np.uint32)
+    else:
+        start_nodes = np.array(start_nodes, dtype=np.uint32)
+
+    if p == 1 and q == 1:
+        walks = _random_walks(
+            indptr, indices, data, start_nodes,
+            n_walks, walk_len)
+    else:
+        walks = _node2vec_random_walks(
+            indptr, indices, data, start_nodes,
+            n_walks, walk_len, p, q)
+
     if verbose:
         duration = time.time() - start_time
         print(f"Random walks - T={duration:.2f}s")
     return walks
 
 
-def corrupt(G, walks, r=.1, use_degree=True, verbose=True):
+def corrupt(G, walks, r=.01, ns_exponent=.75, negative_size=100000, verbose=True):
+    # corrupt random walks
     start_time = time.time()
+
     n_nodes = len(G.nodes)
-
     A = nx.adjacency_matrix(G)
-    adj_indptr = A.indptr
-    adj_indices = A.indices
+    indptr = A.indptr.astype(np.uint32)
+    indices = A.indices.astype(np.uint32)
 
-    if use_degree:
-        degree = np.array(A.sum(axis=1), dtype=np.float32).reshape((n_nodes,))
-        degree = degree.cumsum()
-        degree /= degree.max()
+    # compute weights for each node
+    weights = np.array(
+        [G.degree(node, "weight") for node in G.nodes],
+        dtype=np.float32)
+    weights **= ns_exponent
+    weights /= weights.sum()
+
+    # draw negative table
+    neg = np.random.choice(
+        range(n_nodes),
+        size=negative_size,
+        p=weights,
+        replace=True)
+
+    # corrupt random walks
+    similarity = _corrupt(walks, indptr, indices, neg, n_nodes, r)
+
+    if verbose:
+        elapsed = time.time() - start_time
+        print(f"Corrupt random walks - T={elapsed:.02}s")
     
-        walks, similarity = _weighted_corrupt_walks(
-            walks, adj_indptr, adj_indices, n_nodes, degree, p=r)
+    return similarity
+
+
+def corrupted_random_walks(
+    G,
+    n_walks=10,
+    walk_len=10,
+    sub_sampling=0.1,
+    p=1, q=1, r=.1,
+    ns_exponent=.75,
+    negative_size=100000,
+    start_nodes=None,
+    verbose=True
+):
+    start_time = time.time()
+
+    n_nodes = len(G.nodes)
+    A = get_normalized_adjacency(G, sub_sampling=sub_sampling)
+    indptr = A.indptr.astype(np.uint32)
+    indices = A.indices.astype(np.uint32)
+    data = A.data.astype(np.float32)
+
+
+    if start_nodes is None:
+        start_nodes = np.arange(len(G.nodes)).astype(np.uint32)
     else:
-        walks, similarity = _corrupt_walks(
-            walks, adj_indptr, adj_indices, n_nodes, p=r)
+        start_nodes = np.array(start_nodes, dtype=np.uint32)
+
+    if p == 1 and q == 1:
+        walks = _random_walks(
+            indptr, indices, data, start_nodes,
+            n_walks, walk_len)
+    else:
+        walks = _node2vec_random_walks(
+            indptr, indices, data, start_nodes,
+            n_walks, walk_len, p, q)
 
     if verbose:
         duration = time.time() - start_time
-        print(f"Corrupt random walks - T={duration:.2f}s")
+        print(f"Random walks - T={duration:.2f}s")
+
+    # corrupt random walks
+    start_time = time.time()
+
+    # compute weights for each node
+    weights = np.array(
+        [G.degree(node, "weight") for node in G.nodes],
+        dtype=np.float32)
+    weights **= ns_exponent
+    weights /= weights.sum()
+
+    # draw negative table
+    neg = np.random.choice(
+        range(n_nodes),
+        size=negative_size,
+        p=weights,
+        replace=True)
+
+    # corrupt random walks
+    similarity = _corrupt(walks, indptr, indices, neg, n_nodes, r)
+
+    if verbose:
+        elapsed = time.time() - start_time
+        print(f"Corrupt random walks - T={elapsed:.02}s")
+
     return walks, similarity
