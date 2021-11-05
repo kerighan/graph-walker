@@ -86,6 +86,100 @@ py::array_t<uint32_t> randomWalks(py::array_t<uint32_t> _indptr, py::array_t<uin
 
 }
 
+py::array_t<uint32_t> randomWalksRestart(
+    py::array_t<uint32_t> _indptr,
+    py::array_t<uint32_t> _indices,
+    py::array_t<float> _data,
+    py::array_t<uint32_t> _startNodes,
+    size_t nWalks,
+    size_t walkLen,
+    float alpha)
+{
+    // get data buffers
+    py::buffer_info indptrBuf = _indptr.request();
+    uint32_t *indptr = (uint32_t *)indptrBuf.ptr;
+
+    py::buffer_info indicesBuf = _indices.request();
+    uint32_t *indices = (uint32_t *)indicesBuf.ptr;
+
+    py::buffer_info dataBuf = _data.request();
+    float *data = (float *)dataBuf.ptr;
+
+    py::buffer_info startNodesBuf = _startNodes.request();
+    uint32_t *startNodes = (uint32_t *)startNodesBuf.ptr;
+
+    // general variables
+    size_t nNodes = startNodesBuf.shape[0];
+    size_t shape = nWalks * nNodes;
+
+    // walk matrix
+    py::array_t<uint32_t> _walks({shape, walkLen});
+    py::buffer_info walksBuf = _walks.request();
+    uint32_t *walks = (uint32_t *)walksBuf.ptr;
+
+    // make random walks
+    PARALLEL_FOR_BEGIN(shape)
+    {
+        static thread_local std::random_device rd;
+        static thread_local std::mt19937 generator(rd());
+        std::uniform_real_distribution<> dist(0., 1.);
+        std::vector<float> draws;
+        draws.reserve(walkLen - 1);
+        for (size_t z = 0; z < walkLen - 1; z++)
+        {
+            draws[z] = dist(generator);
+        }
+
+        size_t step = startNodes[i % nNodes];
+        size_t startNode = step;
+        walks[i * walkLen] = step;
+
+        for (size_t k = 1; k < walkLen; k++)
+        {
+            uint32_t start = indptr[step];
+            uint32_t end = indptr[step + 1];
+
+            // if no neighbors, we fill in current node
+            if (start == end)
+            {
+                walks[i * walkLen + k] = step;
+                continue;
+            }
+
+            if (dist(generator) < alpha){
+                step = startNode;
+            } else
+            {
+                // searchsorted
+                float cumsum = 0;
+                size_t index = 0;
+                float draw = draws[k - 1];
+                for (size_t z = start; z < end; z++)
+                {
+                    cumsum += data[z];
+                    if (draw > cumsum)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        index = z;
+                        break;
+                    }
+                }
+
+                // draw next index
+                step = indices[index];
+            }
+
+            // update walk
+            walks[i * walkLen + k] = step;
+        }
+    }
+    PARALLEL_FOR_END();
+
+    return _walks;
+}
 
 py::array_t<uint32_t> n2vRandomWalks(py::array_t<uint32_t> _indptr, py::array_t<uint32_t>_indices, py::array_t<float> _data, py::array_t<uint32_t> _startNodes, size_t nWalks, size_t walkLen, float p, float q){
     // get data buffers
