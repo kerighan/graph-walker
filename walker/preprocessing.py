@@ -1,9 +1,7 @@
-from sklearn.preprocessing import normalize
-from scipy.sparse import diags
 import networkx as nx
 import numpy as np
-import math
-import time
+from scipy.sparse import diags
+from sklearn.preprocessing import normalize
 
 
 def _weight_node(node, G, m, sub_sampling):
@@ -21,6 +19,6 @@ def get_normalized_adjacency(G, sub_sampling=0.1):
             for node in G.nodes
         ])
         A = A.dot(D_inv)
-    
+
     normalize(A, norm="l1", axis=1, copy=False)
     return A

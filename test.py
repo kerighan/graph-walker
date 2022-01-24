@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
-import walker
 
+import walker
 
 G = nx.karate_club_graph()
 walks, similarity = walker.corrupted_random_walks(
