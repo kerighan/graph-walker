@@ -2,6 +2,7 @@ from setuptools import setup, find_packages, Extension
 from glob import glob
 import pybind11
 import os
+import sys
 
 
 ext_modules = [
@@ -15,6 +16,8 @@ ext_modules = [
         extra_compile_args=["-Ofast"])
 ]
 
+if sys.platform == "darwin":
+    ext_modules[0].extra_compile_args.append("-std=c++11")
 
 setup(
     name="graph-walker",
