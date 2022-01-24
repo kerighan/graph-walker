@@ -1,11 +1,13 @@
-from _walker import random_walks as _random_walks
-from _walker import random_walks_with_restart as _random_walks_with_restart
-from _walker import node2vec_random_walks as _node2vec_random_walks
-from _walker import weighted_corrupt as _corrupt
-from .preprocessing import get_normalized_adjacency
+import time
+
 import networkx as nx
 import numpy as np
-import time
+from _walker import node2vec_random_walks as _node2vec_random_walks
+from _walker import random_walks as _random_walks
+from _walker import random_walks_with_restart as _random_walks_with_restart
+from _walker import weighted_corrupt as _corrupt
+
+from .preprocessing import get_normalized_adjacency
 
 
 def random_walks(
@@ -49,7 +51,10 @@ def random_walks(
     return walks
 
 
-def corrupt(G, walks, r=.01, ns_exponent=.75, negative_size=100000, verbose=True):
+def corrupt(
+    G, walks, r=.01, ns_exponent=.75,
+    negative_size=100000, verbose=True
+):
     # corrupt random walks
     start_time = time.time()
 
@@ -78,7 +83,7 @@ def corrupt(G, walks, r=.01, ns_exponent=.75, negative_size=100000, verbose=True
     if verbose:
         elapsed = time.time() - start_time
         print(f"Corrupt random walks - T={elapsed:.02}s")
-    
+
     return similarity
 
 
