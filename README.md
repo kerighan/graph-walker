@@ -17,6 +17,9 @@ G = nx.random_partition_graph([1000] * 15, .01, .001)
 # generate random walks
 X = walker.random_walks(G, n_walks=50, walk_len=25)
 
+# generate random walks with restart probability alpha
+X = walker.random_walks(G, n_walks=50, walk_len=25, alpha=.1)
+
 # you can generate random walks from specified starting nodes
 X = walker.random_walks(G, n_walks=50, walk_len=25, start_nodes=[0, 1, 2])
 

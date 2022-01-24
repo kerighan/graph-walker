@@ -1,4 +1,5 @@
 from _walker import random_walks as _random_walks
+from _walker import random_walks_with_restart as _random_walks_with_restart
 from _walker import node2vec_random_walks as _node2vec_random_walks
 from _walker import weighted_corrupt as _corrupt
 from .preprocessing import get_normalized_adjacency
@@ -12,7 +13,7 @@ def random_walks(
     n_walks=10,
     walk_len=10,
     sub_sampling=0.,
-    p=1, q=1,
+    p=1, q=1, alpha=0,
     start_nodes=None,
     verbose=True
 ):
@@ -29,9 +30,14 @@ def random_walks(
         start_nodes = np.array(start_nodes, dtype=np.uint32)
 
     if p == 1 and q == 1:
-        walks = _random_walks(
-            indptr, indices, data, start_nodes,
-            n_walks, walk_len)
+        if alpha == 0:
+            walks = _random_walks(
+                indptr, indices, data, start_nodes,
+                n_walks, walk_len)
+        else:
+            walks = _random_walks_with_restart(
+                indptr, indices, data, start_nodes,
+                n_walks, walk_len, alpha)
     else:
         walks = _node2vec_random_walks(
             indptr, indices, data, start_nodes,
