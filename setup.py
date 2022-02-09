@@ -18,7 +18,7 @@ ext_modules = [
 
 setup(
     name="graph-walker",
-    version="1.0.5",
+    version="1.0.6",
     author="Maixent Chenebaux",
     author_email="max.chbx@gmail.com",
     description="Fastest library for random walks on graph",
