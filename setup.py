@@ -1,35 +1,35 @@
-import os
-from glob import glob
+# -*- coding: utf-8 -*-
+from setuptools import setup
 
-import pybind11
-from setuptools import Extension, find_packages, setup
+packages = \
+['walker']
 
-ext_modules = [
-    Extension(
-        '_walker',
-        sorted(glob("src/*.cpp")),
-        language='c++',
-        include_dirs=[
-            pybind11.get_include(),
-            pybind11.get_include(True), ],
-        extra_compile_args=["-Ofast", "-std=c++11"])
-]
+package_data = \
+{'': ['*']}
 
+install_requires = \
+['networkx>=3.1,<4.0',
+ 'numpy>=1.26.1,<2.0.0',
+ 'pybind11>=2.8.0,<3.0.0',
+ 'scikit-learn>=1.3.1,<2.0.0',
+ 'scipy>=1.11.3,<2.0.0']
 
-setup(
-    name="graph-walker",
-    version="1.0.6",
-    author="Maixent Chenebaux",
-    author_email="max.chbx@gmail.com",
-    description="Fastest library for random walks on graph",
-    url="https://github.com/kerighan/graph-walker",
-    packages=find_packages(),
-    include_package_data=True,
-    install_requires=["networkx", "numpy",
-                      "scipy", "pybind11", "scikit-learn"],
-    classifiers=[
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
-    ext_modules=ext_modules
-)
+setup_kwargs = {
+    'name': 'walker',
+    'version': '1.0.6',
+    'description': '',
+    'long_description': 'None',
+    'author': 'Octavi Font',
+    'author_email': 'octavi.fs@gmail.com',
+    'maintainer': 'None',
+    'maintainer_email': 'None',
+    'url': 'None',
+    'packages': packages,
+    'package_data': package_data,
+    'install_requires': install_requires,
+    'python_requires': '>=3.11,<3.12',
+}
+from build import *
+build(setup_kwargs)
+
+setup(**setup_kwargs)

@@ -1,0 +1,24 @@
+[tool.poetry]
+name = "walker"
+version = "1.0.6"
+description = ""
+authors = ["Octavi Font <octavi.fs@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+pybind11 = "^2.8.0"
+networkx = "^3.1"
+numpy = "^1.26.1"
+scipy = "^1.11.3"
+scikit-learn = "^1.3.1"
+
+[tool.poetry.build]
+script = "build.py"
+generate-setup-file = true
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0", "pybind11>=2.8.0", "setuptools>=40.9.0"]
+build-backend = "poetry.core.masonry.api"
