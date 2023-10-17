@@ -1,11 +1,22 @@
-# How to install
+# Graph Walker
 
-```
-pip install pybind11
+## User Install
+
+Via your favorite package manager:
+
+``` sh
 pip install graph-walker
+poetry add graph-walker
 ```
 
-# How to use
+## Developer install
+
+``` sh
+poetry install
+pre-commit install
+```
+
+## How to use
 
 ```python
 import networkx as nx
