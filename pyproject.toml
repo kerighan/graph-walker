@@ -18,6 +18,7 @@ generate-setup-file = true
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.2"
+pre-commit = "^3.5.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0", "pybind11>=2.8.0", "setuptools>=40.9.0"]
