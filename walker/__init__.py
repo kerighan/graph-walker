@@ -12,15 +12,15 @@ from .preprocessing import get_normalized_adjacency
 
 def random_walks(
     G,
-    n_walks=10,
-    walk_len=10,
-    sub_sampling=0.0,
-    p=1,
-    q=1,
-    alpha=0,
-    start_nodes=None,
-    verbose=True,
-):
+    n_walks: int = 10,
+    walk_len: int = 10,
+    sub_sampling: float = 0.0,
+    p: float = 1.0,
+    q: float = 1.0,
+    alpha: float = 0.0,
+    start_nodes: list[int] | None = None,
+    verbose: bool = True,
+) -> np.ndarray:
     start_time = time.time()
 
     A = get_normalized_adjacency(G, sub_sampling=sub_sampling)
@@ -51,7 +51,14 @@ def random_walks(
     return walks
 
 
-def corrupt(G, walks, r=0.01, ns_exponent=0.75, negative_size=100000, verbose=True):
+def corrupt(
+    G,
+    walks: np.ndarray,
+    r: float = 0.01,
+    ns_exponent: float = 0.75,
+    negative_size=100000,
+    verbose: bool = True,
+) -> np.ndarray:
     # corrupt random walks
     start_time = time.time()
 

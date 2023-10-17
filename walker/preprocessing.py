@@ -4,13 +4,13 @@ from scipy.sparse import diags
 from sklearn.preprocessing import normalize
 
 
-def _weight_node(node, G, m, sub_sampling):
+def _weight_node(node, G, m, sub_sampling) -> float:
     z = G.degree(node, weight="weight") + 1
     weight = 1 / (z**sub_sampling)
     return weight
 
 
-def get_normalized_adjacency(G, sub_sampling=0.1):
+def get_normalized_adjacency(G: nx.Graph, sub_sampling: float = 0.1) -> np.ndarray:
     A = nx.adjacency_matrix(G).astype(np.float32)
     if sub_sampling != 0:
         m = len(G.edges)
