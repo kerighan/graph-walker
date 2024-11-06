@@ -5,6 +5,8 @@
 namespace py = pybind11;
 
 py::array_t<uint32_t> randomWalks(py::array_t<uint32_t> _indptr, py::array_t<uint32_t> _indices, py::array_t<float> _data, py::array_t<uint32_t> _startNodes, size_t nWalks, size_t walkLen);
+std::tuple<py::array_t<uint32_t>, py::array_t<float>> randomWalksSim(
+    py::array_t<uint32_t> _indptr, py::array_t<uint32_t> _indices, py::array_t<float> _data, py::array_t<float> _original_data, py::array_t<uint32_t> _startNodes, size_t nWalks, size_t walkLen);
 py::array_t<uint32_t> randomWalksRestart(py::array_t<uint32_t> _indptr, py::array_t<uint32_t> _indices, py::array_t<float> _data, py::array_t<uint32_t> _startNodes, size_t nWalks, size_t walkLen, float alpha);
 py::array_t<uint32_t> n2vRandomWalks(py::array_t<uint32_t> _indptr, py::array_t<uint32_t> _indices, py::array_t<float> _data, py::array_t<uint32_t> _startNodes, size_t nWalks, size_t walkLen, float p, float q);
 py::array_t<bool> corruptWalks(py::array_t<uint32_t> _walks, size_t nNodes, float r);

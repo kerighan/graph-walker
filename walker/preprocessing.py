@@ -22,3 +22,18 @@ def get_normalized_adjacency(G, sub_sampling=0.1):
 
     normalize(A, norm="l1", axis=1, copy=False)
     return A
+
+
+def get_normalized_adjacency_and_original(G, sub_sampling=0.1):
+    A = nx.adjacency_matrix(G).astype(np.float32)
+    original_data = np.array(A.data)
+    if sub_sampling != 0:
+        m = len(G.edges)
+        D_inv = diags([
+            _weight_node(node, G, m, sub_sampling)
+            for node in G.nodes
+        ])
+        A = A.dot(D_inv)
+
+    normalize(A, norm="l1", axis=1, copy=False)
+    return A, original_data
